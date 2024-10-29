@@ -46,3 +46,8 @@ def char_count(word: str):
 def uppercase(text: str):
    return {"uppercase": text.upper()}
 
+@app.get("/subtract/{a}/{b}")
+def subtract(a: int, b: int):
+   return {"subtract": a-b}
+
+
