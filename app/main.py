@@ -10,7 +10,7 @@ app = FastAPI()
 
 @app.get("/")  # zone apex
 def zone_apex():
-    return {"Good Day": "Sunshine!"}
+    return {"Hi ": "Bye"}
 
 @app.get("/sum/{a}/{b}")
 def add(a: int, b: int):
@@ -19,3 +19,26 @@ def add(a: int, b: int):
 @app.get("/multiply/{c}/{d}")
 def multiply(c: int, d: int):
     return {"product": c * d}
+
+@app.get("/square/{e}")
+def square(e: int):
+   return {"square": e * e}
+
+@app.get("/reverse_str/{text}")
+def reverse_str(text: str):
+   return {"reversed": text[::-1]}
+
+
+@app.get("/is_prime/{f}")
+def is_prime(f: int):
+   if f <= 1:
+     return {"is_prime": False}
+   for i in range(2, int(f ** 0.5) + 1):
+     if f % i == 0:
+         return {"is_prime": False}
+   return {"is_prime": True}
+
+@app.get("/char_count/{word}")
+def char_count(word: str):
+    return {"char_count": len(word)}
+
