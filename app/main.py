@@ -42,3 +42,7 @@ def is_prime(f: int):
 def char_count(word: str):
     return {"char_count": len(word)}
 
+@app.get("/uppercase/{text}")
+def uppercase(text: str):
+   return {"uppercase": text.upper()}
+
