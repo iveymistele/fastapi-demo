@@ -2,6 +2,7 @@ mysql-connector-python
 uvicorn
 fastapi[standard]
 typing
+pandas
 pydantic
 # pymongo
 # dnspython
