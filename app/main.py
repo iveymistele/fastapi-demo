@@ -3,8 +3,7 @@ import mysql.connector
 from mysql.connector import Error
 from fastapi import Request, FastAPI
 from typing import Optional
-from pydantic import BaseModel
-# import pandas as pd 
+from pydantic import BaseModel 
 import json
 import os
 
