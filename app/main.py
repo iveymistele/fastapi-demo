@@ -1,53 +1,71 @@
 #!/usr/bin/env python3
-
-from fastapi import FastAPI
+import mysql.connector
+from mysql.connector import Error
+from fastapi import Request, FastAPI
 from typing import Optional
 from pydantic import BaseModel
+import pandas as pd 
 import json
 import os
 
 app = FastAPI()
+from fastapi.middleware.cors import CORSMiddleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get('/genres')
+def get_genres():
+    query = "SELECT * FROM genres ORDER BY genreid;"
+    try:    
+        cur.execute(query)
+        headers=[x[0] for x in cur.description]
+        results = cur.fetchall()
+        json_data=[]
+        for result in results:
+            json_data.append(dict(zip(headers,result)))
+        return(json_data)
+    except Error as e:
+        return {"Error": "MySQL Error: " + str(e)}
+
+@app.get("/songs")
+def get_songs():
+    query = "SELECT songs.title, songs.album, songs.artist, songs.year, songs.file, songs.image, genres.genre FROM songs JOIN genres ON songs.genre = genres.genreid;"
+    try:
+        cur.execute(query)
+        headers=[x[0] for x in cur.description]
+        results = cur.fetchall()
+        json_data=[]
+        for result in results:
+            json_data.append(dict(zip(headers,result)))
+        return(json_data)
+    except Error as e:
+        return {"Error": "MySQL Error: " + str(e)}
+
 
 @app.get("/")  # zone apex
 def zone_apex():
-    return {"Hi ": "Bye"}
+    return {"Welcome to ": "my app"}
 
-@app.get("/sum/{a}/{b}")
-def add(a: int, b: int):
-    return {"sum": a + b}
+## @app.get("/customer/{idx}")
+## def customer(idx : int):
+   # read the data into a df 
+  ## df = pd.read_csv("../customers.csv")
+   # filter the data based on interest
+  ## customer = df.iloc[idx]
+  ## return customer.to_dict()
 
-@app.get("/multiply/{c}/{d}")
-def multiply(c: int, d: int):
-    return {"product": c * d}
+@app.post("/get_body")
+def get_body(request: Request):
+   return request.json()
 
-@app.get("/square/{e}")
-def square(e: int):
-   return {"square": e * e}
+DBHOST = "ds2022.cqee4iwdcaph.us-east-1.rds.amazonaws.com"
+DBUSER = "admin"
+DBPASS = os.getenv('DBPASS')
+DB = "zyh4up"
 
-@app.get("/reverse_str/{text}")
-def reverse_str(text: str):
-   return {"reversed": text[::-1]}
-
-
-@app.get("/is_prime/{f}")
-def is_prime(f: int):
-   if f <= 1:
-     return {"is_prime": False}
-   for i in range(2, int(f ** 0.5) + 1):
-     if f % i == 0:
-         return {"is_prime": False}
-   return {"is_prime": True}
-
-@app.get("/char_count/{word}")
-def char_count(word: str):
-    return {"char_count": len(word)}
-
-@app.get("/uppercase/{text}")
-def uppercase(text: str):
-   return {"uppercase": text.upper()}
-
-@app.get("/subtract/{a}/{b}")
-def subtract(a: int, b: int):
-   return {"subtract": a-b}
-
-
+db = mysql.connector.connect(user=DBUSER, host=DBHOST, password=DBPASS, database=DB)
+cur=db.cursor()
