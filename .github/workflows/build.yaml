@@ -1,19 +1,16 @@
 name: container-build
 
 on:
-  # push:
-  #   branches: [ main, dp1 ]
   workflow_run:
     workflows: ["test-container"]
     types:
       - completed
     branches: [main]
 
-
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.actor }}/fastapi-demo
-  IMAGE_TAG: 1.${{ github.run_number }} # GITHUB_RUN_NUMBER
+  IMAGE_TAG: 1.${{ github.run_number }}
   DOCKER_BUILDKIT: 1
 
 jobs:
@@ -37,16 +34,16 @@ jobs:
           password: ${{ secrets.GHCR_PAT }}
 
       - name: Build and Push
+        id: docker_build
         uses: docker/build-push-action@v5
         with:
           context: .
           platforms: linux/amd64,linux/arm64
           provenance: false
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: |
             ghcr.io/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
             ghcr.io/${{ env.IMAGE_NAME }}:latest
-          labels: ${{ steps.meta.outputs.labels }}
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
